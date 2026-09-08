@@ -65,9 +65,9 @@ def download():
     else:
         # For video
         height = format_type
-        # Get best mp4 with h264(avc) + m4a, fallback to any mp4 + m4a, fallback to any video + m4a
+        # Get best mp4 with h264(avc) + m4a, fallback to any mp4 + m4a, fallback to any video + m4a, fallback to best avc single file
         ydl_opts.update({
-            'format': f'bestvideo[ext=mp4][vcodec^=avc][height<={height}]+bestaudio[ext=m4a]/bestvideo[ext=mp4][height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio[ext=m4a]/best[height<={height}]',
+            'format': f'bestvideo[ext=mp4][vcodec^=avc][height<={height}]+bestaudio[ext=m4a]/bestvideo[ext=mp4][height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio[ext=m4a]/best[vcodec^=avc][height<={height}]/best[height<={height}]',
             'merge_output_format': 'mp4',
         })
 
