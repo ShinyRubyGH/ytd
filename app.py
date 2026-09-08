@@ -63,13 +63,28 @@ def download():
             }],
         })
     else:
-        # For video
-        height = format_type
-        # Get best mp4 with h264(avc) + m4a, fallback to any mp4 + m4a, fallback to any video + m4a, fallback to best avc single file
-        ydl_opts.update({
-            'format': f'bestvideo[ext=mp4][vcodec^=avc][height<={height}]+bestaudio[ext=m4a]/bestvideo[ext=mp4][height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio[ext=m4a]/best[vcodec^=avc][height<={height}]/best[height<={height}]',
-            'merge_output_format': 'mp4',
-        })
+        # Dynamic logic based on URL domain
+        if 'tiktok.com' in url or 'instagram.com' in url:
+            # TikTok and Instagram: try to force h264 codec to avoid HEVC/AV1 issues, ignore height limits
+            ydl_opts.update({
+                'format': 'bestvideo[vcodec*=h264]+bestaudio/best[vcodec*=h264]/bestvideo[vcodec^=avc]+bestaudio/best[vcodec^=avc]/best',
+                'merge_output_format': 'mp4',
+                'postprocessors': [{
+                    'key': 'FFmpegVideoConvertor',
+                    'preferedformat': 'mp4',
+                }],
+                'postprocessor_args': [
+                    '-c:v', 'libx264',
+                    '-c:a', 'aac'
+                ]
+            })
+        else:
+            # YouTube: Use user-selected height and prefer mp4/m4a
+            height = format_type
+            ydl_opts.update({
+                'format': f'bestvideo[ext=mp4][vcodec^=avc][height<={height}]+bestaudio[ext=m4a]/bestvideo[ext=mp4][height<={height}]+bestaudio[ext=m4a]/bestvideo[height<={height}]+bestaudio[ext=m4a]/best[height<={height}]',
+                'merge_output_format': 'mp4',
+            })
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
