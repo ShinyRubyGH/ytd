@@ -104,4 +104,12 @@ def download():
         return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    import threading
+    import webbrowser
+    
+    def open_browser():
+        webbrowser.open_new('http://127.0.0.1:5000/')
+        
+    # Open the browser after 1.5 seconds to give the server time to start
+    threading.Timer(1.5, open_browser).start()
+    app.run(debug=False, port=5000)
