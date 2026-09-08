@@ -34,12 +34,16 @@ def get_info():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@app.route('/api/download', methods=['POST'])
+@app.route('/api/download', methods=['GET', 'POST'])
 def download():
-    data = request.json
-    url = data.get('url')
-    format_type = data.get('format', '1080') # 480, 720, 1080, 1440, mp3
-    
+    if request.method == 'POST':
+        data = request.json or {}
+        url = data.get('url')
+        format_type = data.get('format', '1080') # 480, 720, 1080, 1440, mp3
+    else:
+        url = request.args.get('url')
+        format_type = request.args.get('format', '1080')
+        
     if not url:
         return jsonify({'error': 'No URL provided'}), 400
 
